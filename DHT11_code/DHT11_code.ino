@@ -1,52 +1,69 @@
+/*
+ * 🌡️ Project: Arduino Weather Station (DHT11)
+ * Clean Version: No garbage output, formatted numbers.
+ */
+
 #include "DHT.h"
 
-// Hardware Configuration
-#define DHTPIN 2      // Pin where the sensor is connected [cite: 1]
-#define DHTTYPE DHT11 // Sensor type [cite: 1]
+// --- CONFIGURATION ---
+#define DHTPIN  2      // Pin D2
+#define DHTTYPE DHT11  // Sensor type
 
-// Initialize the sensor object
 DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
-  // Initialize the serial monitor at 9600 baud [cite: 2, 23]
+  // 1. Start Serial Communication
   Serial.begin(9600); 
-  Serial.println(F("--- DHT11 System Start ---"));
-  
-  // Initialize the DHT sensor [cite: 2, 3]
+
+  // 2. ANTI-GARBAGE DELAY
+  // Give the serial connection 100ms to stabilize before sending text.
+  delay(100); 
+
+  // 3. CLEAR SCREEN EFFECT
+  // Print empty lines to push away any old "garbage" from previous runs.
+  Serial.println("\n\n\n\n"); 
+
+  // 4. Start Sensor
   dht.begin();
+
+  // 5. Clean Header
+  Serial.println(F("================================="));
+  Serial.println(F("   🌱 DHT11 SYSTEM STARTED 🌱    "));
+  Serial.println(F("================================="));
 }
 
 void loop() {
-  // Reading environmental data [cite: 4]
-  float humidity = dht.readHumidity();           
-  float temperatureC = dht.readTemperature();    // Temperature in Celsius [cite: 4]
-  float temperatureF = dht.readTemperature(true); // Temperature in Fahrenheit [cite: 4]
-  
-  // Calculate Kelvin [cite: 4]
-  float temperatureK = temperatureC + 273.15;
+  // Wait 2 seconds between measurements
+  delay(2000);
 
-  // Check if any reading failed [cite: 5]
-  if (isnan(humidity) || isnan(temperatureC)) {
-    Serial.println(F("Error: Failed to read from DHT sensor!")); // [cite: 5]
+  // Read Data
+  float humidity = dht.readHumidity();
+  float tempC = dht.readTemperature();     
+  float tempF = dht.readTemperature(true); 
+
+  // Check for Errors (Disconnects)
+  if (isnan(humidity) || isnan(tempC) || isnan(tempF)) {
+    Serial.println(F("❌ ERROR: Sensor not found. Check wires!"));
     return;
   }
 
-  // --- Output data to the Serial Monitor ---
-  Serial.print(F("Temperature: "));
-  Serial.print(temperatureC);
-  Serial.print(F("°C | "));
-  
-  Serial.print(temperatureF);
-  Serial.print(F("°F | "));
-  
-  Serial.print(temperatureK);
-  Serial.print(F("K"));
-  Serial.println("");
+  // Calculate Kelvin
+  float tempK = tempC + 273.15;
 
-  Serial.print(F("Humidity: "));
-  Serial.print(humidity);
-  Serial.println(F("%")); // [cite: 7]
+  // --- CLEAN OUTPUT FORMATTING ---
+  // We use ", 1" to show only 1 decimal place (e.g. 24.5 instead of 24.5000)
+  
+  Serial.print(F("💧 Hum: "));
+  Serial.print(humidity, 0); // Humidity usually doesn't need decimals
+  Serial.print(F("%  |  "));
 
-  // Delay between readings for stability (2 seconds) [cite: 7, 22]
-  delay(2000); 
+  Serial.print(F("🌡️ Temp: "));
+  Serial.print(tempC, 1);    // 1 decimal for Celsius
+  Serial.print(F("°C / "));
+  
+  Serial.print(tempF, 1);    // 1 decimal for Fahrenheit
+  Serial.print(F("°F / "));
+
+  Serial.print(tempK, 1);    // 1 decimal for Kelvin
+  Serial.println(F("K"));
 }
