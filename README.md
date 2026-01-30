@@ -35,9 +35,9 @@ Connecting the DHT11 is straightforward. [cite_start]Follow this pinout for the 
 
 | DHT11 Pin | Arduino Pin | Description |
 | :---: | :---: | :--- |
-| **VCC** | **5V / 3.3V** | [cite_start]Power Supply [cite: 10] |
-| **DATA** | **D2** | [cite_start]Digital Data Out [cite: 10, 18] |
-| **GND** | **GND** | [cite_start]Ground [cite: 10] |
+| **VCC** | **5V / 3.3V** | Power Supply |
+| **DATA** | **D2** | Digital Data Out |
+| **GND** | **GND** | Ground |
 
 ---
 
