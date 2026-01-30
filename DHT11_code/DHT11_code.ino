@@ -1,69 +1,38 @@
-/*
- * 🌡️ Project: Arduino Weather Station (DHT11)
- * Clean Version: No garbage output, formatted numbers.
- */
-
 #include "DHT.h"
 
-// --- CONFIGURATION ---
-#define DHTPIN  2      // Pin D2
-#define DHTTYPE DHT11  // Sensor type
+#define DHTPIN 2      // Pin where the sensor is connected
+#define DHTTYPE DHT11 // Sensor type
 
 DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
-  // 1. Start Serial Communication
-  Serial.begin(9600); 
-
-  // 2. ANTI-GARBAGE DELAY
-  // Give the serial connection 100ms to stabilize before sending text.
-  delay(100); 
-
-  // 3. CLEAR SCREEN EFFECT
-  // Print empty lines to push away any old "garbage" from previous runs.
-  Serial.println("\n\n\n\n"); 
-
-  // 4. Start Sensor
-  dht.begin();
-
-  // 5. Clean Header
-  Serial.println(F("================================="));
-  Serial.println(F("   🌱 DHT11 SYSTEM STARTED 🌱    "));
-  Serial.println(F("================================="));
+  Serial.begin(9600); // Initialize the serial monitor
+  dht.begin();        // Initialize the sensor
 }
 
 void loop() {
-  // Wait 2 seconds between measurements
-  delay(2000);
+  float humidity = dht.readHumidity();           // Read humidity
+  float temperatureC = dht.readTemperature();   // Temperature in Celsius
+  float temperatureF = dht.readTemperature(true); // Temperature in Fahrenheit
+  float temperatureK = temperatureC + 273.15;   // Temperature in Kelvin
 
-  // Read Data
-  float humidity = dht.readHumidity();
-  float tempC = dht.readTemperature();     
-  float tempF = dht.readTemperature(true); 
-
-  // Check for Errors (Disconnects)
-  if (isnan(humidity) || isnan(tempC) || isnan(tempF)) {
-    Serial.println(F("❌ ERROR: Sensor not found. Check wires!"));
+  if (isnan(humidity) || isnan(temperatureC)) {
+    Serial.println("Error reading data!");
     return;
   }
 
-  // Calculate Kelvin
-  float tempK = tempC + 273.15;
+  // Output data to the serial monitor
+  Serial.print("Temperature: ");
+  Serial.print(temperatureC);
+  Serial.print("°C, ");
+  Serial.print(temperatureF);
+  Serial.print("°F, ");
+  Serial.print(temperatureK);
+  Serial.println("K");
 
-  // --- CLEAN OUTPUT FORMATTING ---
-  // We use ", 1" to show only 1 decimal place (e.g. 24.5 instead of 24.5000)
-  
-  Serial.print(F("💧 Hum: "));
-  Serial.print(humidity, 0); // Humidity usually doesn't need decimals
-  Serial.print(F("%  |  "));
+  Serial.print("Humidity: ");
+  Serial.print(humidity);
+  Serial.println("%");
 
-  Serial.print(F("🌡️ Temp: "));
-  Serial.print(tempC, 1);    // 1 decimal for Celsius
-  Serial.print(F("°C / "));
-  
-  Serial.print(tempF, 1);    // 1 decimal for Fahrenheit
-  Serial.print(F("°F / "));
-
-  Serial.print(tempK, 1);    // 1 decimal for Kelvin
-  Serial.println(F("K"));
+  delay(2000); // Delay between readings
 }
